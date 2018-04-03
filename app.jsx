@@ -1,16 +1,19 @@
 const $container = document.getElementById('container');
-const players = [
+const PLAYERS = [
     {
         name: "Jim Hoskinggg",
-        score: 46
+        score: 46,
+        id: 1
     },
     {
         name: "Fred Flintyyy",
-        score: 19
+        score: 19,
+        id: 2
     },
     {
         name: "Scott Mctominay",
-        score: 78
+        score: 78,
+        id: 3
     }
 ];
 
@@ -34,14 +37,9 @@ const Player = (props) => {
             <div className="player-name">
                 {props.name}
             </div>
-            <Counter score={props.score}/>
+            <Counter />
         </div>
     );
-}
-
-Player.defaultProps = {
-    name: 'Jim Hoskins',
-    score: 46
 }
 
 Player.propTypes = {
@@ -49,27 +47,25 @@ Player.propTypes = {
     score: React.PropTypes.number.isRequired
 }
 
-
-
-const Counter = (props) => {
-    return (
-        <div className="player-score">
-            <div className="counter">
-                <button className="counter-action decrement"> - </button>
-                <div className="counter-score">{props.score}</div>
-                <button className="counter-action increment"> + </button>
+const Counter = React.createClass({
+    propTypes: {},
+    getInitialState: () => {
+        return {
+            score: 0
+        }
+    },
+    render: function() {
+        return (
+            <div className="player-score">
+                <div className="counter">
+                    <button className="counter-action decrement"> - </button>
+                    <div className="counter-score">{this.state.score}</div>
+                    <button className="counter-action increment"> + </button>
+                </div>
             </div>
-        </div>
-    );
-}
-
-Counter.defaultProps = {
-    score: 46
-}
-
-Counter.propTypes = {
-    score: React.PropTypes.number
-}
+        )
+    },
+});
 
 
 
@@ -79,9 +75,9 @@ const Element = (props) => {
             <Header title={props.title}/>
 
             <div className="players">
-                <Player name={props.name} score={props.score}/>
-
-                <Player name="Fred Dingleberry" score={34}/>
+                {props.players.map((player) => {
+                    return <Player name={player.name} score={player.score} key={player.id}/>
+                })}
             </div>
 
         </div>
@@ -89,8 +85,12 @@ const Element = (props) => {
 }
 
 Element.propTypes = {
-    title: React.PropTypes.string
-    players: React.PropTypes.array.isRequired
+    title: React.PropTypes.string,
+    players: React.PropTypes.arrayOf(React.PropTypes.shape({
+        name: React.PropTypes.string.isRequired,
+        score: React.PropTypes.number.isRequired,
+        id: React.PropTypes.number.isRequired
+    })).isRequired
 };
 
 Element.defaultProps = {
@@ -99,4 +99,4 @@ Element.defaultProps = {
 
 
 
-ReactDOM.render(<Element/>, $container);
+ReactDOM.render(<Element players={PLAYERS}/>, $container);

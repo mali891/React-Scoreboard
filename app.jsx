@@ -22,13 +22,12 @@ const Header = (props) => {
         <div className="header">
             <h1>{props.title}</h1>
         </div>
-    )
+    );
 }
 
 Header.propTypes = {
     title: React.PropTypes.string.isRequired
 }
-
 
 
 const Player = (props) => {
@@ -37,78 +36,85 @@ const Player = (props) => {
             <div className="player-name">
                 {props.name}
             </div>
-            <Counter initialScore={props.score} />
+            <Counter score={props.score} onChange={props.onScoreChange} />
         </div>
     );
 }
 
+
 Player.propTypes = {
     name: React.PropTypes.string.isRequired,
-    score: React.PropTypes.number.isRequired
+    score: React.PropTypes.number.isRequired,
+    onScoreChange: React.PropTypes.func.isRequired
 }
 
-const Counter = React.createClass({
-    propTypes: {
-        initialScore: React.PropTypes.number.isRequired
-    },
-    getInitialState: function() {
-        return {
-            score: this.props.initialScore
-        }
-    },
-    incrementScore: function() {
-        this.setState({
-            score:(this.state.score + 1)
-        })
-    },
-    decrementScore: function() {
-        this.setState({
-            score:(this.state.score - 1)
-        })
-    },
-    render: function() {
-        return (
-            <div className="player-score">
-                <div className="counter">
-                    <button className="counter-action decrement" onClick={this.decrementScore}> - </button>
-                    <div className="counter-score">{this.state.score}</div>
-                    <button className="counter-action increment" onClick={this.incrementScore}> + </button>
-                </div>
-            </div>
-        )
-    },
-});
-
-
-
-const Element = (props) => {
+const Counter = (props) => {
     return (
-        <div className="scoreboard">
-            <Header title={props.title}/>
-
-            <div className="players">
-                {props.players.map((player) => {
-                    return <Player name={player.name} score={player.score} key={player.id}/>
-                })}
+        <div className="player-score">
+            <div className="counter">
+                <button className="counter-action decrement" onClick={() => {props.onChange(-1)}}> - </button>
+                <div className="counter-score">{props.score}</div>
+                <button className="counter-action increment" onClick={() => {props.onChange(+1)}}> + </button>
             </div>
-
         </div>
     )
 }
 
-Element.propTypes = {
-    title: React.PropTypes.string,
-    players: React.PropTypes.arrayOf(React.PropTypes.shape({
-        name: React.PropTypes.string.isRequired,
-        score: React.PropTypes.number.isRequired,
-        id: React.PropTypes.number.isRequired
-    })).isRequired
-};
-
-Element.defaultProps = {
-    title:"Scoreboard"
-};
+Counter.propTypes = {
+    score: React.PropTypes.number.isRequired,
+    onChange: React.PropTypes.func.isRequired
+}
 
 
+const Application = React.createClass({
+    render: function() {
+        return (
+            <div className="scoreboard">
+                <Header title={this.props.title}/>
 
-ReactDOM.render(<Element players={PLAYERS}/>, $container);
+                <div className="players">
+                    {this.state.players.map((player) => {
+                        return (
+                            <Player
+                                onScoreChange={this.onScoreChange}
+                                name={player.name}
+                                score={player.score}
+                                key={player.id}
+                            />
+                        )
+                    }.bind(this))}
+                </div>
+
+            </div>
+        )
+    },
+
+    getInitialState: function() {
+        return {
+            players: this.props.initialPlayers
+        }
+    },
+
+    onScoreChange: function(delta) {
+        console.log(delta);
+    },
+
+    propTypes: {
+        title: React.PropTypes.string,
+        initialPlayers: React.PropTypes.arrayOf(React.PropTypes.shape({
+            name: React.PropTypes.string.isRequired,
+            score: React.PropTypes.number.isRequired,
+            id: React.PropTypes.number.isRequired
+        })).isRequired
+    },
+
+    getDefaultProps: function() {
+        return {
+            title: "Scoreboard"
+        }
+    }
+});
+
+
+
+ReactDOM.render(<Application initialPlayers={PLAYERS}/>, $container);
